@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GerenciadorRecebiveisAPI.Migrations
 {
     [DbContext(typeof(RecebiveisDbContext))]
-    [Migration("20250207020520_Init")]
-    partial class Init
+    [Migration("20250207180658_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,41 @@ namespace GerenciadorRecebiveisAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmpresaId");
+
                     b.ToTable("Carrinhos");
+                });
+
+            modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Checkout", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CarrinhoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("Desagio")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Taxa")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("ValorBruto")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("ValorLiquido")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarrinhoId")
+                        .IsUnique();
+
+                    b.ToTable("Checkouts");
                 });
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Empresa", b =>
@@ -93,6 +127,28 @@ namespace GerenciadorRecebiveisAPI.Migrations
                     b.ToTable("NotasFiscais");
                 });
 
+            modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>
+                {
+                    b.HasOne("GerenciadorRecebiveisAPI.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Checkout", b =>
+                {
+                    b.HasOne("GerenciadorRecebiveisAPI.Models.Carrinho", "Carrinho")
+                        .WithOne("Checkout")
+                        .HasForeignKey("GerenciadorRecebiveisAPI.Models.Checkout", "CarrinhoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Carrinho");
+                });
+
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.NotaFiscal", b =>
                 {
                     b.HasOne("GerenciadorRecebiveisAPI.Models.Carrinho", null)
@@ -102,6 +158,8 @@ namespace GerenciadorRecebiveisAPI.Migrations
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>
                 {
+                    b.Navigation("Checkout");
+
                     b.Navigation("NotasFiscais");
                 });
 #pragma warning restore 612, 618

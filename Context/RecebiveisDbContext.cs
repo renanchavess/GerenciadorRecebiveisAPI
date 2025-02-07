@@ -12,5 +12,6 @@ namespace GerenciadorRecebiveisAPI.Context
         public DbSet<Models.Empresa> Empresas { get; set; }
         public DbSet<Models.NotaFiscal> NotasFiscais { get; set; }
         public DbSet<Models.Carrinho> Carrinhos { get; set; }
+        public DbSet<Models.Checkout> Checkouts { get; set; }
     }
 }
