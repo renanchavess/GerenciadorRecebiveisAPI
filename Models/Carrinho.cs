@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace GerenciadorRecebiveisAPI.Models
@@ -11,10 +12,13 @@ namespace GerenciadorRecebiveisAPI.Models
 
         public int EmpresaId { get; set; }
 
-        public Empresa Empresa { get; set; }
+        [JsonIgnore]
+        public Empresa? Empresa { get; set; }
 
+        [JsonIgnore]
         public ICollection<NotaFiscal>? NotasFiscais { get; set; }
 
+        [JsonIgnore]
         public Checkout? Checkout { get; set; }
 
         public Carrinho()

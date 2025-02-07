@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace GerenciadorRecebiveisAPI.Models
@@ -20,5 +21,10 @@ namespace GerenciadorRecebiveisAPI.Models
         public DateTime DataVencimento { get; set; }
 
         public int EmpresaId { get; set; }
+
+        public int CarrinhoId { get; set; }
+
+        [JsonIgnore]
+        Carrinho? Carrinho { get; set; }
     }
 }

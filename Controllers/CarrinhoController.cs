@@ -19,12 +19,6 @@ namespace GerenciadorRecebiveisAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Carrinho>>> GetCarrinhos()
-        {
-            return await _context.Carrinhos.ToListAsync<Carrinho>();            
-        }
-
         [HttpGet("{id:int}", Name = "GetCarrinho")]
         public async Task<ActionResult<Carrinho>> GetCarrinho(int id)
         {

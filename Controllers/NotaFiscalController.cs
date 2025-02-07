@@ -19,12 +19,6 @@ namespace GerenciadorRecebiveisAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<NotaFiscal>>> GetNotasFiscais()
-        {
-            return await _context.NotasFiscais.ToListAsync<NotaFiscal>();
-        }
-
         [HttpGet("{id:int}", Name = "GetNotaFiscal")]
         public async Task<ActionResult<NotaFiscal>> GetNotaFiscal(int id)
         {
