@@ -3,6 +3,7 @@ using System;
 using GerenciadorRecebiveisAPI.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GerenciadorRecebiveisAPI.Migrations
 {
     [DbContext(typeof(RecebiveisDbContext))]
-    [Migration("20250207180658_init")]
-    partial class init
+    [Migration("20250207204917_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,13 +21,17 @@ namespace GerenciadorRecebiveisAPI.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EmpresaId")
                         .HasColumnType("int");
@@ -44,11 +49,13 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CarrinhoId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Data")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Desagio")
                         .HasColumnType("decimal(10,2)");
@@ -76,10 +83,12 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("CNPJ")
                         .IsRequired()
                         .HasMaxLength(18)
-                        .HasColumnType("varchar(18)");
+                        .HasColumnType("nvarchar(18)");
 
                     b.Property<decimal>("Faturamento")
                         .HasColumnType("decimal(10,2)");
@@ -87,7 +96,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<int>("Ramo")
                         .HasColumnType("int");
@@ -103,11 +112,13 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("CarrinhoId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CarrinhoId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataVencimento")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("EmpresaId")
                         .HasColumnType("int");
@@ -115,7 +126,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                     b.Property<string>("Numero")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(10,2)");
@@ -153,7 +164,9 @@ namespace GerenciadorRecebiveisAPI.Migrations
                 {
                     b.HasOne("GerenciadorRecebiveisAPI.Models.Carrinho", null)
                         .WithMany("NotasFiscais")
-                        .HasForeignKey("CarrinhoId");
+                        .HasForeignKey("CarrinhoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>
