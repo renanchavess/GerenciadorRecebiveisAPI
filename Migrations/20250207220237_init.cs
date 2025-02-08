@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -12,34 +11,28 @@ namespace GerenciadorRecebiveisAPI.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "Empresas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "varchar(80)", maxLength: 80, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CNPJ = table.Column<string>(type: "varchar(18)", maxLength: 18, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    CNPJ = table.Column<string>(type: "nvarchar(18)", maxLength: 18, nullable: false),
                     Faturamento = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Ramo = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Empresas", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "Carrinhos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmpresaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -51,17 +44,16 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         principalTable: "Empresas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "Checkouts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CarrinhoId = table.Column<int>(type: "int", nullable: false),
-                    Data = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Data = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Taxa = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     ValorBruto = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     ValorLiquido = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -76,19 +68,17 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         principalTable: "Carrinhos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "NotasFiscais",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Numero = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Numero = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    DataVencimento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DataVencimento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EmpresaId = table.Column<int>(type: "int", nullable: false),
                     CarrinhoId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -100,8 +90,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         column: x => x.CarrinhoId,
                         principalTable: "Carrinhos",
                         principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Carrinhos_EmpresaId",

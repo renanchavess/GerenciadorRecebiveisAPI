@@ -60,7 +60,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
             carrinho.NotasFiscais.Add(notaFiscal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
+            return Ok();
         }
 
         [HttpDelete("{id:int}/removerNotaFiscal")]
@@ -80,27 +80,6 @@ namespace GerenciadorRecebiveisAPI.Controllers
             }
 
             carrinho.NotasFiscais.Remove(notaFiscal);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
-        }
-
-        [HttpPost("{id:int}/checkout")]
-        public async Task<ActionResult<Carrinho>> checkout(int id)
-        {
-            var carrinho = await _context.Carrinhos.FindAsync(id);
-
-            if (carrinho == null)
-            {
-                return NotFound();
-            }
-
-            if (carrinho.NotasFiscais.Count == 0)
-            {
-                return BadRequest();
-            }
-
-            _context.Carrinhos.Remove(carrinho);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);

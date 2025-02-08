@@ -18,13 +18,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
         {
             _context = context;
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Empresa>>> GetEmpresas()
-        {
-            return await _context.Empresas.ToListAsync<Empresa>();
-        }
-
+        
         [HttpGet("{id:int}", Name = "GetEmpresa")]
         public async Task<ActionResult<Empresa>> GetEmpresa(int id)
         {
