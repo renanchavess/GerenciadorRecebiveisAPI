@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GerenciadorRecebiveisAPI.DTOs;
 using GerenciadorRecebiveisAPI.Enum;
 using GerenciadorRecebiveisAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -34,18 +35,17 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Checkout>> PostCheckout(int carrinhoId)
+        public async Task<ActionResult<ResponseCheckout>> PostCheckout(int carrinhoId)
         {
             Carrinho carrinho = await _context.Carrinhos
                                             .Include(c => c.Empresa)
                                             .Include(c => c.NotasFiscais)
-                                            .FirstOrDefaultAsync<Carrinho>((c => c.Id == carrinhoId));  
+                                            .FirstOrDefaultAsync<Carrinho>((c => c.Id == carrinhoId));
             
             if (carrinho == null)
             {
                 return NotFound();
             }
-
             
             if (carrinho.NotasFiscais.Count == 0)
             {
@@ -53,15 +53,27 @@ namespace GerenciadorRecebiveisAPI.Controllers
             }
 
             decimal taxa = 4.65m;
-
             Checkout checkout = new Checkout(taxa, carrinho);
-            checkout.ValidarLimiteAntecipacao();
-            checkout.CalcularDesagio(taxa);
+
+            if (checkout.ValidarLimiteAntecipacao()) {
+                return BadRequest("Limite de antecipação excedido!");
+            }
+
+            var notasFiscaisDesagio = checkout.CalcularDesagio((double)taxa);
 
             _context.Checkouts.Add(checkout);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCheckout", new { id = checkout.Id }, checkout);
+            ResponseCheckout responseCheckout = new ResponseCheckout(
+                carrinho.Empresa.Nome,
+                carrinho.Empresa.CNPJ,
+                checkout.calcularLimite(carrinho.Empresa),
+                checkout.ValorLiquido,
+                checkout.ValorBruto,
+                notasFiscaisDesagio
+            );
+
+            return Ok(responseCheckout);
         }
     }
 }

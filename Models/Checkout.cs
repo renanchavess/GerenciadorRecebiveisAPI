@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.Enum;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -14,6 +15,7 @@ namespace GerenciadorRecebiveisAPI.Models
 
         public int CarrinhoId { get; set; }
         
+        [JsonIgnore]
         public Carrinho? Carrinho { get; set; }      
 
         public DateTime Data { get; set; }
@@ -44,50 +46,67 @@ namespace GerenciadorRecebiveisAPI.Models
         {
             if (this.Carrinho == null)
                 return false;
-
-            decimal faturamento = this.Carrinho.Empresa.Faturamento;
+            
             decimal totalNotas = this.Carrinho.ValorTotalNotas();
-            Ramo ramo = this.Carrinho.Empresa.Ramo;
+            decimal limite = calcularLimite(this.Carrinho.Empresa);
+
+            return  !(totalNotas <= limite);
+        }
+
+        public decimal calcularLimite(Empresa empresa)
+        {
+            decimal faturamento = empresa.Faturamento;
+            decimal limite = 0;
+
+            Ramo ramo = empresa.Ramo;
             
 
             if (faturamento < 10000)
-                return false;            
+                return 0;
 
-            if (faturamento < 50001) {
-                if (totalNotas > (faturamento * 0.5m))
-                    return false;
+            if (faturamento < 50001)
+            {
+                limite = faturamento * 0.5m;
             }
 
-            if (faturamento <= 100001) {
-                if (ramo == Ramo.Produtos && totalNotas > (faturamento * 0.55m))
-                    return false;
-                if (ramo == Ramo.Servicos && totalNotas > (faturamento * 0.6m))
-                    return false;
+            if (faturamento <= 100001)
+            {
+                if (ramo == Ramo.Produtos)
+                    limite = faturamento * 0.55m;
+                if (ramo == Ramo.Servicos)
+                    limite = faturamento * 0.6m;
             }
 
-            if (ramo == Ramo.Produtos && totalNotas > (faturamento * 0.60m))
-                return false;
-            if (ramo == Ramo.Servicos && totalNotas > (faturamento * 0.65m))
-                return false;
+            if (ramo == Ramo.Produtos)
+                limite = faturamento * 0.60m;
+            if (ramo == Ramo.Servicos)
+                limite = faturamento * 0.65m;
 
-            return true;
-        }    
+            return limite;
+        }
 
-        public void CalcularDesagio(decimal taxa)
+        public List<NotaFiscalDesagio> CalcularDesagio(double taxa)
         {
+            var desatioNotas = new List<NotaFiscalDesagio>();
             decimal desagioTotal = 0;
+            taxa = taxa / 100;
+
             foreach (var notaFiscal in Carrinho.NotasFiscais)
             {
-                double prazo = (notaFiscal.DataVencimento.Date - DateTime.Now.Date).TotalDays;                
-                double taxaDecimal = (double)taxa / 100;                
-                double expoente = prazo / 30.0;
-                double denominador = Math.Pow(1 + taxaDecimal, expoente);
-                decimal valorPresente = notaFiscal.Valor / (decimal)denominador;                
-                desagioTotal += notaFiscal.Valor - valorPresente;
+                double prazo = (notaFiscal.DataVencimento.Date - DateTime.Now.AddDays(1).Date).TotalDays;                                                
+                double desagioNota = (double)notaFiscal.Valor / Math.Pow((1.00 + taxa), (prazo / 30.0));                
+                decimal desagio= decimal.Round(notaFiscal.Valor -(decimal)desagioNota, 2);
+                desagioTotal +=  desagio;
+                decimal valorLiquido =notaFiscal.Valor - desagio;
+
+                NotaFiscalDesagio desagioNotaFiscal = new NotaFiscalDesagio(notaFiscal.Numero, notaFiscal.Valor, valorLiquido);
+                desatioNotas.Add(desagioNotaFiscal);
             }
 
             this.Desagio = decimal.Round(desagioTotal, 2);
-            this.ValorLiquido = this.ValorBruto - this.Desagio;
+            this.ValorLiquido = decimal.Round(Carrinho.ValorTotalNotas() - this.Desagio, 2);
+
+            return desatioNotas;
         }
     }
 }

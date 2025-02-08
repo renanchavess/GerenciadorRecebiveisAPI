@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GerenciadorRecebiveisAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,7 +80,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                     Valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     DataVencimento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EmpresaId = table.Column<int>(type: "int", nullable: false),
-                    CarrinhoId = table.Column<int>(type: "int", nullable: false)
+                    CarrinhoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -89,8 +89,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                         name: "FK_NotasFiscais_Carrinhos_CarrinhoId",
                         column: x => x.CarrinhoId,
                         principalTable: "Carrinhos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

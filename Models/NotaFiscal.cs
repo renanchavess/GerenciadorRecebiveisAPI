@@ -22,7 +22,7 @@ namespace GerenciadorRecebiveisAPI.Models
 
         public int EmpresaId { get; set; }
 
-        public int CarrinhoId { get; set; }
+        public int? CarrinhoId { get; set; }
 
         [JsonIgnore]
         Carrinho? Carrinho { get; set; }

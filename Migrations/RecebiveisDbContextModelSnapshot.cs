@@ -111,7 +111,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CarrinhoId")
+                    b.Property<int?>("CarrinhoId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataVencimento")
@@ -161,9 +161,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                 {
                     b.HasOne("GerenciadorRecebiveisAPI.Models.Carrinho", null)
                         .WithMany("NotasFiscais")
-                        .HasForeignKey("CarrinhoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CarrinhoId");
                 });
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>

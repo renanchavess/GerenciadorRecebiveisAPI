@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GerenciadorRecebiveisAPI.Migrations
 {
     [DbContext(typeof(RecebiveisDbContext))]
-    [Migration("20250207204917_Init")]
-    partial class Init
+    [Migration("20250207220237_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,7 +114,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CarrinhoId")
+                    b.Property<int?>("CarrinhoId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataVencimento")
@@ -164,9 +164,7 @@ namespace GerenciadorRecebiveisAPI.Migrations
                 {
                     b.HasOne("GerenciadorRecebiveisAPI.Models.Carrinho", null)
                         .WithMany("NotasFiscais")
-                        .HasForeignKey("CarrinhoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CarrinhoId");
                 });
 
             modelBuilder.Entity("GerenciadorRecebiveisAPI.Models.Carrinho", b =>
