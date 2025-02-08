@@ -8,9 +8,9 @@ namespace GerenciadorRecebiveisAPI.Repositories
 {
     public interface ICarrinhoRepository
     {
-        Carrinho GetCarrinho(int id);
-        Carrinho Create(Carrinho carrinho);
-        Carrinho AdicionarNotaFiscal(int id, NotaFiscal notafiscal);
-        Carrinho RemoverNotaFiscal(int id, NotaFiscal notafiscal);
+        Task<Carrinho> GetCarrinhoAsync(int id);
+        Task<Carrinho> CreateAsync(Carrinho carrinho);
+        Task<bool> AdicionarNotaFiscalAsync(int id, NotaFiscal notafiscal);
+        Task<bool> RemoverNotaFiscalAsync(int id, NotaFiscal notafiscal);
     }
 }

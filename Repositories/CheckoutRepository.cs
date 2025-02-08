@@ -16,19 +16,19 @@ namespace GerenciadorRecebiveisAPI.Repositories
             _context = context;
         }
 
-        public Checkout Create(Checkout checkout)
+        public async Task<Checkout> CreateAsync(Checkout checkout)
         {
             if (checkout == null)            
                 throw new ArgumentNullException(nameof(checkout));
 
             _context.Checkouts.Add(checkout);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return checkout;
         }
 
-        public Checkout GetCheckout(int id)
+        public async Task<Checkout> GetCheckoutAsync(int id)
         {
-            var checkout = _context.Checkouts.Find(id);
+            var checkout = await _context.Checkouts.FindAsync(id);
             
             if (checkout == null)
                 throw new ArgumentNullException(nameof(checkout));

@@ -17,37 +17,36 @@ namespace GerenciadorRecebiveisAPI.Repositories
             _context = context;
         }
         
-        public Carrinho AdicionarNotaFiscal(int id, NotaFiscal notafiscal)
+        public async Task<bool> AdicionarNotaFiscalAsync(int id, NotaFiscal notafiscal)
         {
-            var carrinho = _context.Carrinhos.Include(c => c.NotasFiscais).FirstOrDefault(c => c.Id == id);
+            Carrinho carrinho = await _context.Carrinhos.Include(c => c.NotasFiscais).FirstOrDefaultAsync(c => c.Id == id);
+
             if (carrinho == null || notafiscal == null)
             {
                 throw new ArgumentNullException(nameof(carrinho));
             }            
 
-            carrinho.NotasFiscais.Add(notafiscal);
+            carrinho.NotasFiscais.Add(notafiscal);            
             _context.Entry(carrinho).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-
-            return carrinho;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Carrinho Create(Carrinho carrinho)
+        public async Task<Carrinho> CreateAsync(Carrinho carrinho)
         {
             if (carrinho == null)            
                 throw new ArgumentNullException(nameof(carrinho));
 
             _context.Carrinhos.Add(carrinho);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return carrinho;
         }
 
-        public Carrinho GetCarrinho(int id)
+        public async Task<Carrinho> GetCarrinhoAsync(int id)
         {
-            var carrinho = _context.Carrinhos
+            var carrinho = await _context.Carrinhos
                                     .Include(c => c.Empresa)
                                     .Include(c => c.NotasFiscais)
-                                    .FirstOrDefault(c => c.Id == id);
+                                    .FirstOrDefaultAsync(c => c.Id == id);
 
             if (carrinho == null)            
                 throw new ArgumentNullException(nameof(carrinho));
@@ -55,7 +54,7 @@ namespace GerenciadorRecebiveisAPI.Repositories
             return carrinho;
         }
 
-        public Carrinho RemoverNotaFiscal(int id, NotaFiscal notafiscal)
+        public async Task<bool> RemoverNotaFiscalAsync(int id, NotaFiscal notafiscal)
         {
             var carrinho = _context.Carrinhos.Include(c => c.NotasFiscais).FirstOrDefault(c => c.Id == id);
             if (carrinho == null || notafiscal == null)
@@ -65,9 +64,7 @@ namespace GerenciadorRecebiveisAPI.Repositories
 
             carrinho.NotasFiscais.Remove(notafiscal);
             _context.Entry(carrinho).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-
-            return carrinho;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

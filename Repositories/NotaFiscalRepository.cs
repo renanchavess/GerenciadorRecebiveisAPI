@@ -16,19 +16,19 @@ namespace GerenciadorRecebiveisAPI.Repositories
             _context = context;
         }
         
-        public NotaFiscal Create(NotaFiscal notafiscal)
+        public async Task<NotaFiscal> CreateAsync(NotaFiscal notafiscal)
         {
             if (notafiscal == null)            
                 throw new ArgumentNullException(nameof(notafiscal));
 
-            _context.NotasFiscais.Add(notafiscal);
-            _context.SaveChanges();
+            await _context.NotasFiscais.AddAsync(notafiscal);
+            await _context.SaveChangesAsync();
             return notafiscal;
         }
 
-        public NotaFiscal GetNotaFiscal(int id)
+        public async Task<NotaFiscal> GetNotaFiscalAsync(int id)
         {
-            var notafiscal = _context.NotasFiscais.Find(id);
+            var notafiscal = await _context.NotasFiscais.FindAsync(id);
 
             if (notafiscal == null)
                 throw new ArgumentNullException(nameof(notafiscal));

@@ -8,7 +8,7 @@ namespace GerenciadorRecebiveisAPI.Repositories
 {
     public interface INotaFiscalRepository
     {
-        NotaFiscal GetNotaFiscal(int id);
-        NotaFiscal Create(NotaFiscal notafiscal);
+        Task<NotaFiscal> GetNotaFiscalAsync(int id);
+        Task<NotaFiscal> CreateAsync(NotaFiscal notafiscal);
     }
 }

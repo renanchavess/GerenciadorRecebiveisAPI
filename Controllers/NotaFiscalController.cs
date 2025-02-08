@@ -21,9 +21,9 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetNotaFiscal")]
-        public ActionResult<NotaFiscal> GetNotaFiscal(int id)
+        public async Task<ActionResult<NotaFiscal>> GetNotaFiscal(int id)
         {
-            var notaFiscal = _repository.GetNotaFiscal(id);
+            var notaFiscal = await _repository.GetNotaFiscalAsync(id);
 
             if (notaFiscal == null)
             {
@@ -34,12 +34,12 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<NotaFiscal> PostNotaFiscal(NotaFiscal notaFiscal)
+        public async Task<ActionResult<NotaFiscal>> PostNotaFiscal(NotaFiscal notaFiscal)
         {
             if (notaFiscal.DataVencimento.Date <= DateTime.Now.Date)
                 return BadRequest("Data de vencimento inválida!");
 
-            _repository.Create(notaFiscal);
+            await _repository.CreateAsync(notaFiscal);
             
             return CreatedAtAction("GetNotaFiscal", new { id = notaFiscal.Id }, notaFiscal);
         }

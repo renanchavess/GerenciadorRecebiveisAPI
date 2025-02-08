@@ -25,16 +25,16 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCheckout")]
-        public ActionResult<Checkout> GetCheckout(int id)
+        public async Task<ActionResult<Checkout>> GetCheckout(int id)
         {
-            var checkout = _checkoutRepository.GetCheckout(id);
+            var checkout = await _checkoutRepository.GetCheckoutAsync(id);
             return checkout;
         }
 
         [HttpPost]
-        public ActionResult<ResponseCheckout> PostCheckout(int carrinhoId)
+        public async Task<ActionResult<ResponseCheckout>> PostCheckout(int carrinhoId)
         {
-            Carrinho carrinho = _carrinhoRepository.GetCarrinho(carrinhoId);
+            Carrinho carrinho = await _carrinhoRepository.GetCarrinhoAsync(carrinhoId);
 
             if (carrinho.NotasFiscais.Count == 0)
             {
@@ -50,7 +50,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
 
             var notasFiscaisDesagio = checkout.CalcularDesagio((double)taxa);
 
-            _checkoutRepository.Create(checkout);
+            await _checkoutRepository.CreateAsync(checkout);
 
             ResponseCheckout responseCheckout = new ResponseCheckout(
                 carrinho.Empresa.Nome,

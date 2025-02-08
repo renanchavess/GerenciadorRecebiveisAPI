@@ -21,19 +21,19 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
         
         [HttpGet("{id:int}", Name = "GetEmpresa")]
-        public ActionResult<Empresa> GetEmpresa(int id)
+        public async Task<ActionResult<Empresa>> GetEmpresa(int id)
         {
-            var empresa = _repository.GetEmpresa(id);
+            var empresa = await _repository.GetEmpresaAsync(id);
             return empresa;
         }
 
         [HttpPost]
-        public ActionResult<Empresa> PostEmpresa(Empresa empresa)
+        public async Task<ActionResult<Empresa>> PostEmpresa(Empresa empresa)
         {
             if (empresa == null)
                 return BadRequest();
             
-            _repository.Create(empresa);
+            await _repository.CreateAsync(empresa);
             return CreatedAtAction("GetEmpresa", new { id = empresa.Id }, empresa);
         }
     }

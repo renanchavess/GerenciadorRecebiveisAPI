@@ -23,44 +23,45 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCarrinho")]
-        public ActionResult<Carrinho> GetCarrinho(int id)
+        public async Task<ActionResult<Carrinho>> GetCarrinho(int id)
         {
-            var carrinho = _repository.GetCarrinho(id);
+            var carrinho = await _repository.GetCarrinhoAsync(id);
             return carrinho;
         }
 
         [HttpPost]
         public async Task<ActionResult<Carrinho>> PostCarrinho(Carrinho carrinho)
         {
-            _repository.Create(carrinho);
+            await _repository.CreateAsync(carrinho);
             return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
         }
 
         [HttpPost("{id:int}/adicionarNotaFiscal")]
-        public ActionResult AdicionarNotaFiscal(int id, int notaFiscalId)
+        public async Task<ActionResult> AdicionarNotaFiscal(int id, int notaFiscalId)
         {
-            var notaFiscal = _repositoryNotaFiscal.GetNotaFiscal(notaFiscalId);
+            var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
 
             if (notaFiscal.EmpresaId != id && notaFiscal.DataVencimento.Date > DateTime.Now.AddDays(1).Date)
             {
                 throw new ArgumentException();
             }
             
-             _repository.AdicionarNotaFiscal(id, notaFiscal);
+            await _repository.AdicionarNotaFiscalAsync(id, notaFiscal);
             return Ok();
         }
 
         [HttpDelete("{id:int}/removerNotaFiscal")]
-        public ActionResult RemoverNotaFiscal(int id, int notaFiscalId)
+        public async Task<ActionResult> RemoverNotaFiscal(int id, int notaFiscalId)
         {
-            var notaFiscal = _repositoryNotaFiscal.GetNotaFiscal(notaFiscalId);
+            var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
 
             if (notaFiscal.CarrinhoId != id)
             {
                 throw new ArgumentException();
             }
             
-            _repository.RemoverNotaFiscal(id, notaFiscal);
+            await _repository.RemoverNotaFiscalAsync(id, notaFiscal);
+            
             return Ok();
         }
 
