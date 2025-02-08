@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.Models;
+using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,32 +13,27 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class EmpresaController : ControllerBase
     {
-        private readonly Context.RecebiveisDbContext _context;
+        private readonly IEmpresaRepository _repository;
 
-        public EmpresaController(Context.RecebiveisDbContext context)
+        public EmpresaController(IEmpresaRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         
         [HttpGet("{id:int}", Name = "GetEmpresa")]
-        public async Task<ActionResult<Empresa>> GetEmpresa(int id)
+        public ActionResult<Empresa> GetEmpresa(int id)
         {
-            var empresa = await _context.Empresas.FindAsync(id);
-
-            if (empresa == null)
-            {
-                return NotFound();
-            }
-
+            var empresa = _repository.GetEmpresa(id);
             return empresa;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Empresa>> PostEmpresa(Empresa empresa)
+        public ActionResult<Empresa> PostEmpresa(Empresa empresa)
         {
-            _context.Empresas.Add(empresa);
-            await _context.SaveChangesAsync();
-
+            if (empresa == null)
+                return BadRequest();
+            
+            _repository.Create(empresa);
             return CreatedAtAction("GetEmpresa", new { id = empresa.Id }, empresa);
         }
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.DTOs;
 using GerenciadorRecebiveisAPI.Enum;
 using GerenciadorRecebiveisAPI.Models;
+using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,39 +15,27 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class CheckoutController : ControllerBase
     {
-        private readonly Context.RecebiveisDbContext _context;
+        private readonly ICheckoutRepository _checkoutRepository;
+        private readonly ICarrinhoRepository _carrinhoRepository;
 
-        public CheckoutController(Context.RecebiveisDbContext context)
+        public CheckoutController(ICheckoutRepository checkoutRepository, ICarrinhoRepository carrinhoRepository)
         {
-            _context = context;
+            _checkoutRepository = checkoutRepository;
+            _carrinhoRepository = carrinhoRepository;
         }
 
         [HttpGet("{id:int}", Name = "GetCheckout")]
-        public async Task<ActionResult<Checkout>> GetCheckout(int id)
+        public ActionResult<Checkout> GetCheckout(int id)
         {
-            var checkout = await _context.Checkouts.FindAsync(id);
-
-            if (checkout == null)
-            {
-                return NotFound();
-            }
-
+            var checkout = _checkoutRepository.GetCheckout(id);
             return checkout;
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseCheckout>> PostCheckout(int carrinhoId)
+        public ActionResult<ResponseCheckout> PostCheckout(int carrinhoId)
         {
-            Carrinho carrinho = await _context.Carrinhos
-                                            .Include(c => c.Empresa)
-                                            .Include(c => c.NotasFiscais)
-                                            .FirstOrDefaultAsync<Carrinho>((c => c.Id == carrinhoId));
-            
-            if (carrinho == null)
-            {
-                return NotFound();
-            }
-            
+            Carrinho carrinho = _carrinhoRepository.GetCarrinho(carrinhoId);
+
             if (carrinho.NotasFiscais.Count == 0)
             {
                 return BadRequest("Carrinho sem notas fiscais!");
@@ -61,8 +50,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
 
             var notasFiscaisDesagio = checkout.CalcularDesagio((double)taxa);
 
-            _context.Checkouts.Add(checkout);
-            await _context.SaveChangesAsync();
+            _checkoutRepository.Create(checkout);
 
             ResponseCheckout responseCheckout = new ResponseCheckout(
                 carrinho.Empresa.Nome,

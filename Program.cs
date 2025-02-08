@@ -1,6 +1,7 @@
 using GerenciadorRecebiveisAPI.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using GerenciadorRecebiveisAPI.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add before builder.Build()
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<INotaFiscalRepository, NotaFiscalRepository>();
+builder.Services.AddScoped<ICheckoutRepository, CheckoutRepository>();
+builder.Services.AddScoped<ICarrinhoRepository, CarrinhoRepository>();
 
 string sqlServerConnection = builder.Configuration.GetConnectionString("SqlServerConnection");
 builder.Services.AddDbContext<RecebiveisDbContext>(options => options.UseSqlServer(sqlServerConnection));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.Models;
+using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,17 +13,17 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class NotaFiscalController : ControllerBase
     {
-        private readonly Context.RecebiveisDbContext _context;
+        private readonly INotaFiscalRepository _repository;
 
-        public NotaFiscalController(Context.RecebiveisDbContext context)
+        public NotaFiscalController(INotaFiscalRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet("{id:int}", Name = "GetNotaFiscal")]
-        public async Task<ActionResult<NotaFiscal>> GetNotaFiscal(int id)
+        public ActionResult<NotaFiscal> GetNotaFiscal(int id)
         {
-            var notaFiscal = await _context.NotasFiscais.FindAsync(id);
+            var notaFiscal = _repository.GetNotaFiscal(id);
 
             if (notaFiscal == null)
             {
@@ -33,16 +34,13 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<NotaFiscal>> PostNotaFiscal(NotaFiscal notaFiscal)
+        public ActionResult<NotaFiscal> PostNotaFiscal(NotaFiscal notaFiscal)
         {
             if (notaFiscal.DataVencimento.Date <= DateTime.Now.Date)
-            {
                 return BadRequest("Data de vencimento inválida!");
-            }
 
-            _context.NotasFiscais.Add(notaFiscal);
-            await _context.SaveChangesAsync();
-
+            _repository.Create(notaFiscal);
+            
             return CreatedAtAction("GetNotaFiscal", new { id = notaFiscal.Id }, notaFiscal);
         }
 

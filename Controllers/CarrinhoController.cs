@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.Models;
+using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,77 +13,55 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class CarrinhoController : ControllerBase
     {
-        private readonly Context.RecebiveisDbContext _context;
+        private readonly ICarrinhoRepository _repository;
+        private readonly INotaFiscalRepository _repositoryNotaFiscal;
 
-        public CarrinhoController(Context.RecebiveisDbContext context)
+        public CarrinhoController(ICarrinhoRepository repository, INotaFiscalRepository repositoryNotaFiscal)
         {
-            _context = context;
+            _repositoryNotaFiscal = repositoryNotaFiscal;
+            _repository = repository;
         }
 
         [HttpGet("{id:int}", Name = "GetCarrinho")]
-        public async Task<ActionResult<Carrinho>> GetCarrinho(int id)
+        public ActionResult<Carrinho> GetCarrinho(int id)
         {
-            var carrinho = await _context.Carrinhos.FindAsync(id);
-
-            if (carrinho == null)
-            {
-                return NotFound();
-            }
-
+            var carrinho = _repository.GetCarrinho(id);
             return carrinho;
         }
 
         [HttpPost]
         public async Task<ActionResult<Carrinho>> PostCarrinho(Carrinho carrinho)
         {
-            _context.Carrinhos.Add(carrinho);
-            await _context.SaveChangesAsync();
-
+            _repository.Create(carrinho);
             return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
         }
 
         [HttpPost("{id:int}/adicionarNotaFiscal")]
-        public async Task<ActionResult<Carrinho>> AdicionarNotaFiscal(int id, int notaFiscalId)
+        public ActionResult AdicionarNotaFiscal(int id, int notaFiscalId)
         {
-            Carrinho carrinho = await _context.Carrinhos.FirstOrDefaultAsync<Carrinho>((c => c.Id == id));
-            NotaFiscal notaFiscal = await _context.NotasFiscais.FirstOrDefaultAsync<NotaFiscal>((n => n.Id == notaFiscalId));
+            var notaFiscal = _repositoryNotaFiscal.GetNotaFiscal(notaFiscalId);
 
-            if (carrinho == null || notaFiscal == null)
+            if (notaFiscal.EmpresaId != id && notaFiscal.DataVencimento.Date > DateTime.Now.AddDays(1).Date)
             {
-                return NotFound();
+                throw new ArgumentException();
             }
-
-            if (notaFiscal.EmpresaId != carrinho.EmpresaId && notaFiscal.DataVencimento.Date > DateTime.Now.Date)
-            {
-                return BadRequest();
-            }
-
-            carrinho.NotasFiscais.Add(notaFiscal);
-            await _context.SaveChangesAsync();
-
+            
+             _repository.AdicionarNotaFiscal(id, notaFiscal);
             return Ok();
         }
 
         [HttpDelete("{id:int}/removerNotaFiscal")]
-        public async Task<ActionResult<Carrinho>> RemoverNotaFiscal(int id, int notaFiscalId)
+        public ActionResult RemoverNotaFiscal(int id, int notaFiscalId)
         {
-            var carrinho = await _context.Carrinhos.FindAsync(id);
-            var notaFiscal = await _context.NotasFiscais.FindAsync(notaFiscalId);
+            var notaFiscal = _repositoryNotaFiscal.GetNotaFiscal(notaFiscalId);
 
-            if (carrinho == null || notaFiscal == null)
+            if (notaFiscal.CarrinhoId != id)
             {
-                return NotFound();
+                throw new ArgumentException();
             }
-
-            if (notaFiscal.EmpresaId != carrinho.EmpresaId)
-            {
-                return BadRequest();
-            }
-
-            carrinho.NotasFiscais.Remove(notaFiscal);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
+            
+            _repository.RemoverNotaFiscal(id, notaFiscal);
+            return Ok();
         }
 
     }
