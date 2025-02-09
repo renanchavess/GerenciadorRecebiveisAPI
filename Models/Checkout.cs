@@ -85,9 +85,9 @@ namespace GerenciadorRecebiveisAPI.Models
             return limite;
         }
 
-        public List<NotaFiscalDesagio> CalcularDesagio(double taxa)
+        public List<NotaFiscalCheckout> CalcularDesagio(double taxa)
         {
-            var desatioNotas = new List<NotaFiscalDesagio>();
+            var desatioNotas = new List<NotaFiscalCheckout>();
             decimal desagioTotal = 0;
             taxa = taxa / 100;
             DateTime dataInicio = DateTime.Today.AddDays(1);
@@ -100,7 +100,7 @@ namespace GerenciadorRecebiveisAPI.Models
                 desagioTotal +=  desagio;
                 decimal valorLiquido =notaFiscal.Valor - desagio;
 
-                NotaFiscalDesagio desagioNotaFiscal = new NotaFiscalDesagio(notaFiscal.Numero, notaFiscal.Valor, valorLiquido);
+                NotaFiscalCheckout desagioNotaFiscal = new NotaFiscalCheckout(notaFiscal.Numero, notaFiscal.Valor, valorLiquido);
                 desatioNotas.Add(desagioNotaFiscal);
             }
 

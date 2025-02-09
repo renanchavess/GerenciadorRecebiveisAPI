@@ -14,13 +14,13 @@ namespace GerenciadorRecebiveisAPI.DTOs
         public decimal Limite { get; set; }
         public decimal TotalLiquido { get; set; }
         public decimal TotalBruto { get; set; }
-        public List<NotaFiscalDesagio>? NotasFiscaisDesagio { get; set; }    
+        public List<NotaFiscalCheckout>? NotasFiscaisDesagio { get; set; }    
 
         public ResponseCheckout() {
             
         }
 
-        public ResponseCheckout(string empresa, string cnpj, decimal limite, decimal totalLiquido, decimal totalBruto, List<NotaFiscalDesagio> notasFiscaisDesagio)
+        public ResponseCheckout(string empresa, string cnpj, decimal limite, decimal totalLiquido, decimal totalBruto, List<NotaFiscalCheckout> notasFiscaisDesagio)
         {
             Empresa = empresa;
             Cnpj = cnpj;

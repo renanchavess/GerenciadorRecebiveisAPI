@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace GerenciadorRecebiveisAPI.Models
 {
-    public class NotaFiscalDesagio
+    public class NotaFiscalCheckout
     {
         public string Numero { get; set; }
         public decimal ValorBruto { get; set; }
         public decimal ValorLiquido { get; set; }
 
-        public NotaFiscalDesagio(string numero, decimal valorBruto, decimal valorLiquido)
+        public NotaFiscalCheckout(string numero, decimal valorBruto, decimal valorLiquido)
         {
             Numero = numero;
             ValorBruto = valorBruto;
