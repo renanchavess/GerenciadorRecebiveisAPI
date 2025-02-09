@@ -9,5 +9,6 @@ namespace GerenciadorRecebiveisAPI.Repositories
     public interface ICheckoutRepository
     {
         Task<Checkout> CreateAsync(Checkout checkout);
+        Task<Checkout> GetAsync(int id);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GerenciadorRecebiveisAPI.DTOs;
 using GerenciadorRecebiveisAPI.Models;
 using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +24,34 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCarrinho")]
-        public async Task<ActionResult<Carrinho>> GetCarrinho(int id)
+        public async Task<ActionResult<ResponseCarrinho>> GetCarrinho(int id)
         {
-            var carrinho = await _repository.GetCarrinhoAsync(id);
-            return carrinho;
+            Carrinho carrinho = await _repository.GetCarrinhoAsync(id);
+            ResponseCarrinho responseCarrinho = new ResponseCarrinho()
+            {
+                Id = carrinho.Id,
+                EmpresaId = carrinho.EmpresaId,
+                NotasFiscais = carrinho.NotasFiscais.Select(nf => new ResponseNotaFiscal()
+                {
+                    Id = nf.Id,
+                    Numero = nf.Numero,
+                    Valor = nf.Valor,
+                    DataVencimento = DateOnly.FromDateTime(nf.DataVencimento),
+                    EmpresaId = nf.EmpresaId
+                }).ToList()
+            };
+            
+            return responseCarrinho;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Carrinho>> PostCarrinho(Carrinho carrinho)
+        public async Task<ActionResult<ResponseCarrinho>> PostCarrinho(RequestPostCarrinho carrinhoRequest)
         {
+            Carrinho carrinho = new Carrinho()
+            {
+                EmpresaId = carrinhoRequest.EmpresaId                
+            };
+
             await _repository.CreateAsync(carrinho);
             return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
         }

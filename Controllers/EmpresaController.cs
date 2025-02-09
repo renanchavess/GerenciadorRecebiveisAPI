@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GerenciadorRecebiveisAPI.DTOs;
 using GerenciadorRecebiveisAPI.Models;
 using GerenciadorRecebiveisAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -21,17 +22,35 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
         
         [HttpGet("{id:int}", Name = "GetEmpresa")]
-        public async Task<ActionResult<Empresa>> GetEmpresa(int id)
+        public async Task<ActionResult<ResponseEmpresa>> GetEmpresa(int id)
         {
             var empresa = await _repository.GetEmpresaAsync(id);
-            return empresa;
+
+            ResponseEmpresa responseEmpresa = new ResponseEmpresa()
+            {
+                Id = empresa.Id,
+                Nome = empresa.Nome,
+                Cnpj = empresa.CNPJ,
+                Faturamento = empresa.Faturamento,
+                Ramo = empresa.Ramo
+            };
+
+            return responseEmpresa;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Empresa>> PostEmpresa(Empresa empresa)
+        public async Task<ActionResult<Empresa>> PostEmpresa(RequestPostEmpresa empresaPost)
         {
-            if (empresa == null)
+            if (empresaPost == null)
                 return BadRequest();
+
+            Empresa empresa = new Empresa()
+            {
+                Nome = empresaPost.Nome,
+                CNPJ = empresaPost.Cnpj,
+                Faturamento = empresaPost.Faturamento,
+                Ramo = empresaPost.Ramo
+            };
             
             await _repository.CreateAsync(empresa);
             return CreatedAtAction("GetEmpresa", new { id = empresa.Id }, empresa);
