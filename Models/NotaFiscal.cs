@@ -13,7 +13,7 @@ namespace GerenciadorRecebiveisAPI.Models
         public int Id { get; set; }
 
         [StringLength(30)]
-        public required string Numero { get; set; }
+        public int Numero { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal Valor { get; set; }

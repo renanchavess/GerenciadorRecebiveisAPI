@@ -16,18 +16,5 @@ namespace GerenciadorRecebiveisAPI.DTOs
         public decimal TotalBruto { get; set; }
         public List<NotaFiscalCheckout>? NotasFiscaisDesagio { get; set; }    
 
-        public ResponseCheckout() {
-            
-        }
-
-        public ResponseCheckout(string empresa, string cnpj, decimal limite, decimal totalLiquido, decimal totalBruto, List<NotaFiscalCheckout> notasFiscaisDesagio)
-        {
-            Empresa = empresa;
-            Cnpj = cnpj;
-            Limite = limite;
-            TotalLiquido = totalLiquido;
-            TotalBruto = totalBruto;
-            NotasFiscaisDesagio = notasFiscaisDesagio;
-        }        
     }
 }

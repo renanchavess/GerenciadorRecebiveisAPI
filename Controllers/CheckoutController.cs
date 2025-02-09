@@ -45,14 +45,14 @@ namespace GerenciadorRecebiveisAPI.Controllers
 
             await _checkoutRepository.CreateAsync(checkout);
 
-            ResponseCheckout responseCheckout = new ResponseCheckout(
-                carrinho.Empresa.Nome,
-                carrinho.Empresa.CNPJ,
-                checkout.calcularLimite(carrinho.Empresa),
-                checkout.ValorLiquido,
-                checkout.ValorBruto,
-                notasFiscaisDesagio
-            );
+            ResponseCheckout responseCheckout = new ResponseCheckout(){
+                Empresa = carrinho.Empresa.Nome,
+                Cnpj = carrinho.Empresa.CNPJ,
+                Limite = checkout.CalcularLimite(carrinho.Empresa),
+                TotalLiquido = checkout.ValorLiquido,
+                TotalBruto = checkout.ValorBruto,
+                NotasFiscaisDesagio = notasFiscaisDesagio
+            };
 
             return Ok(responseCheckout);
         }

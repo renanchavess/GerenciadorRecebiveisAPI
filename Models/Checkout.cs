@@ -48,41 +48,27 @@ namespace GerenciadorRecebiveisAPI.Models
                 return false;
             
             decimal totalNotas = this.Carrinho.ValorTotalNotas();
-            decimal limite = calcularLimite(this.Carrinho.Empresa);
+            decimal limite = CalcularLimite(this.Carrinho.Empresa);
 
             return  !(totalNotas <= limite);
         }
 
-        public decimal calcularLimite(Empresa empresa)
+        public decimal CalcularLimite(Empresa empresa)
         {
-            decimal faturamento = empresa.Faturamento;
-            decimal limite = 0;
-
-            Ramo ramo = empresa.Ramo;
-            
-
-            if (faturamento < 10000)
+            if (empresa.Faturamento < 10000m)
                 return 0;
 
-            if (faturamento < 50001)
+            var percentual = (empresa.Faturamento, empresa.Ramo) switch
             {
-                limite = faturamento * 0.5m;
-            }
+                ( < 50001m, _) => 0.5m,
+                ( < 100001m, Ramo.Servicos) => 0.55m,
+                ( < 100001m, Ramo.Produtos) => 0.6m,
+                ( >= 100001m, Ramo.Servicos) => 0.6m,
+                ( >= 100001m, Ramo.Produtos) => 0.65m,
+                _ => 0m
+            };
 
-            if (faturamento <= 100001)
-            {
-                if (ramo == Ramo.Produtos)
-                    limite = faturamento * 0.55m;
-                if (ramo == Ramo.Servicos)
-                    limite = faturamento * 0.6m;
-            }
-
-            if (ramo == Ramo.Produtos)
-                limite = faturamento * 0.60m;
-            if (ramo == Ramo.Servicos)
-                limite = faturamento * 0.65m;
-
-            return limite;
+            return empresa.Faturamento * percentual;
         }
 
         public List<NotaFiscalCheckout> CalcularDesagio(double taxa)
