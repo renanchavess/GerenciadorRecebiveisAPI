@@ -90,10 +90,11 @@ namespace GerenciadorRecebiveisAPI.Models
             var desatioNotas = new List<NotaFiscalDesagio>();
             decimal desagioTotal = 0;
             taxa = taxa / 100;
-
+            DateTime dataInicio = DateTime.Today.AddDays(1);
+            
             foreach (var notaFiscal in Carrinho.NotasFiscais)
             {
-                double prazo = (notaFiscal.DataVencimento.Date - DateTime.Now.AddDays(1).Date).TotalDays;                                                
+                double prazo = (notaFiscal.DataVencimento.Date - dataInicio).TotalDays;                                                
                 double desagioNota = (double)notaFiscal.Valor / Math.Pow((1.00 + taxa), (prazo / 30.0));                
                 decimal desagio= decimal.Round(notaFiscal.Valor -(decimal)desagioNota, 2);
                 desagioTotal +=  desagio;

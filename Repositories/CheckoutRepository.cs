@@ -25,15 +25,5 @@ namespace GerenciadorRecebiveisAPI.Repositories
             await _context.SaveChangesAsync();
             return checkout;
         }
-
-        public async Task<Checkout> GetCheckoutAsync(int id)
-        {
-            var checkout = await _context.Checkouts.FindAsync(id);
-            
-            if (checkout == null)
-                throw new ArgumentNullException(nameof(checkout));
-
-            return checkout;
-        }
     }
 }

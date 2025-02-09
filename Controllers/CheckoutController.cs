@@ -24,13 +24,6 @@ namespace GerenciadorRecebiveisAPI.Controllers
             _carrinhoRepository = carrinhoRepository;
         }
 
-        [HttpGet("{id:int}", Name = "GetCheckout")]
-        public async Task<ActionResult<Checkout>> GetCheckout(int id)
-        {
-            var checkout = await _checkoutRepository.GetCheckoutAsync(id);
-            return checkout;
-        }
-
         [HttpPost]
         public async Task<ActionResult<ResponseCheckout>> PostCheckout(int carrinhoId)
         {
