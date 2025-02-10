@@ -57,9 +57,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
                 Empresa = carrinho.Empresa.Nome,
                 Cnpj = carrinho.Empresa.CNPJ,
                 Limite = checkout.CalcularLimite(carrinho.Empresa),
-                TotalLiquido = checkout.ValorLiquido,
-                TotalBruto = checkout.ValorBruto,
-                NotasFiscaisDesagio = notasFiscaisDesagio
+                NotasFiscais = notasFiscaisDesagio
             };
 
             return Ok(responseCheckout);

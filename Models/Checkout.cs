@@ -73,7 +73,7 @@ namespace GerenciadorRecebiveisAPI.Models
 
         public List<NotaFiscalCheckout> CalcularDesagio(double taxa)
         {
-            var desatioNotas = new List<NotaFiscalCheckout>();
+            var notaFiscalCheckout = new List<NotaFiscalCheckout>();
             decimal desagioTotal = 0;
             taxa = taxa / 100;
       
@@ -83,15 +83,18 @@ namespace GerenciadorRecebiveisAPI.Models
                 decimal desagio= decimal.Round(notaFiscal.Valor -(decimal)desagioNota, 2);
                 desagioTotal +=  desagio;
                 decimal valorLiquido =notaFiscal.Valor - desagio;
-
-                NotaFiscalCheckout desagioNotaFiscal = new NotaFiscalCheckout(notaFiscal.Numero, notaFiscal.Valor, valorLiquido);
-                desatioNotas.Add(desagioNotaFiscal);
+                
+                notaFiscalCheckout.Add(new NotaFiscalCheckout(){
+                    Numero = notaFiscal.Numero,
+                    ValorBruto = notaFiscal.Valor,
+                    ValorLiquido = valorLiquido
+                });
             }
 
             this.Desagio = decimal.Round(desagioTotal, 2);
             this.ValorLiquido = decimal.Round(Carrinho.ValorTotalNotas() - this.Desagio, 2);
 
-            return desatioNotas;
+            return notaFiscalCheckout;
         }
     }
 }

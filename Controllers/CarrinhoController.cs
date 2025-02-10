@@ -17,10 +17,12 @@ namespace GerenciadorRecebiveisAPI.Controllers
     {
         private readonly ICarrinhoRepository _repository;
         private readonly INotaFiscalRepository _repositoryNotaFiscal;
+        private readonly ICheckoutRepository _repositoryCheckout;
 
-        public CarrinhoController(ICarrinhoRepository repository, INotaFiscalRepository repositoryNotaFiscal)
+        public CarrinhoController(ICarrinhoRepository repository, INotaFiscalRepository repositoryNotaFiscal, ICheckoutRepository repositoryCheckout)
         {
             _repositoryNotaFiscal = repositoryNotaFiscal;
+            _repositoryCheckout = repositoryCheckout;
             _repository = repository;
         }
 
@@ -61,11 +63,22 @@ namespace GerenciadorRecebiveisAPI.Controllers
         public async Task<ActionResult> AdicionarNotaFiscal(int id, [Required] int notaFiscalId)
         {
             var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
-            DateOnly hoje = DateOnly.FromDateTime(DateTime.Now);
+            Checkout checkout = await _repositoryCheckout.GetCheckoutByCarrinhoId(id);
+            Carrinho carrinho = await _repository.GetCarrinhoAsync(id);
 
-            if (notaFiscal.EmpresaId != id && notaFiscal.Vencida())
+            if (notaFiscal.EmpresaId != carrinho.EmpresaId)
             {
-                throw new ArgumentException();
+                return BadRequest("Nota fiscal não pertence a empresa!");
+            }
+
+            if (notaFiscal.Vencida())
+            {
+                return BadRequest("Nota fiscal vencida!");
+            }
+
+            if (checkout is not null)
+            {
+                return BadRequest("Checkout já realizado carrinho não pode ser alterado!");
             }
             
             await _repository.AdicionarNotaFiscalAsync(id, notaFiscal);
@@ -76,12 +89,18 @@ namespace GerenciadorRecebiveisAPI.Controllers
         public async Task<ActionResult> RemoverNotaFiscal(int id, int notaFiscalId)
         {
             var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
+            Checkout checkout = await _repositoryCheckout.GetCheckoutByCarrinhoId(id);
 
             if (notaFiscal.CarrinhoId != id)
             {
-                throw new ArgumentException();
+                return BadRequest("Nota fiscal não pertence ao carrinho!");
             }
             
+            if (checkout is not null)
+            {
+                return BadRequest("Checkout já realizado carrinho não pode ser alterado!");
+            }
+
             await _repository.RemoverNotaFiscalAsync(id, notaFiscal);
             
             return Ok();

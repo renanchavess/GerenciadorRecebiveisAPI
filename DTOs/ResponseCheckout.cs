@@ -12,9 +12,7 @@ namespace GerenciadorRecebiveisAPI.DTOs
         public string Empresa { get; set; }
         public string Cnpj { get; set; }
         public decimal Limite { get; set; }
-        public decimal TotalLiquido { get; set; }
-        public decimal TotalBruto { get; set; }
-        public List<NotaFiscalCheckout>? NotasFiscaisDesagio { get; set; }    
+        public List<NotaFiscalCheckout>? NotasFiscais { get; set; }    
 
     }
 }

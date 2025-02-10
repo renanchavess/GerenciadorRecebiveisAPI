@@ -27,7 +27,7 @@ namespace GerenciadorRecebiveisAPI.Models
 
         public bool Vencida()
         {
-            return DataVencimento.DayNumber < DateOnly.FromDateTime(DateTime.Now).DayNumber;
+            return DataVencimento.DayNumber <= DateOnly.FromDateTime(DateTime.Now).DayNumber;
         }
 
         public int Prazo()
