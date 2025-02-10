@@ -26,6 +26,11 @@ namespace GerenciadorRecebiveisAPI.Controllers
         {
             var notaFiscal = await _repository.GetNotaFiscalAsync(id);
 
+            if (notaFiscal == null)
+            {
+                return NotFound();
+            }
+
             ResponseNotaFiscal responseNota = new ResponseNotaFiscal()
             {
                 Id = notaFiscal.Id,
@@ -34,11 +39,6 @@ namespace GerenciadorRecebiveisAPI.Controllers
                 DataVencimento = DateOnly.FromDateTime(notaFiscal.DataVencimento),
                 EmpresaId = notaFiscal.EmpresaId
             };
-
-            if (notaFiscal == null)
-            {
-                return NotFound();
-            }
 
             return responseNota;
         }
