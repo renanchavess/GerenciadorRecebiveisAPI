@@ -30,9 +30,6 @@ namespace GerenciadorRecebiveisAPI.Repositories
         {
             var notafiscal = await _context.NotasFiscais.FindAsync(id);
 
-            if (notafiscal == null)
-                throw new ArgumentNullException(nameof(notafiscal));
-
             return notafiscal;
         }
     }

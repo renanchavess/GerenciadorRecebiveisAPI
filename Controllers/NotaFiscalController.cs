@@ -36,7 +36,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
                 Id = notaFiscal.Id,
                 Numero = notaFiscal.Numero,
                 Valor = notaFiscal.Valor,
-                DataVencimento = DateOnly.FromDateTime(notaFiscal.DataVencimento),
+                DataVencimento = notaFiscal.DataVencimento,
                 EmpresaId = notaFiscal.EmpresaId
             };
 
@@ -53,7 +53,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
             {
                 Numero = notaFiscalPost.Numero,
                 Valor = notaFiscalPost.Valor,
-                DataVencimento = notaFiscalPost.DataVencimento.ToDateTime(TimeOnly.MinValue),
+                DataVencimento = notaFiscalPost.DataVencimento,
                 EmpresaId = notaFiscalPost.EmpresaId
             };
     

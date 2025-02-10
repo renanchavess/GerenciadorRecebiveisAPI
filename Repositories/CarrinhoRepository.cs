@@ -48,15 +48,13 @@ namespace GerenciadorRecebiveisAPI.Repositories
                                     .Include(c => c.NotasFiscais)
                                     .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (carrinho == null)            
-                throw new ArgumentNullException(nameof(carrinho));
-
             return carrinho;
         }
 
         public async Task<bool> RemoverNotaFiscalAsync(int id, NotaFiscal notafiscal)
         {
             var carrinho = _context.Carrinhos.Include(c => c.NotasFiscais).FirstOrDefault(c => c.Id == id);
+            
             if (carrinho == null || notafiscal == null)
             {
                 throw new ArgumentNullException(nameof(carrinho));

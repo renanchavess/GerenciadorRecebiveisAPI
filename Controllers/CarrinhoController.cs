@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.DTOs;
@@ -36,7 +37,7 @@ namespace GerenciadorRecebiveisAPI.Controllers
                     Id = nf.Id,
                     Numero = nf.Numero,
                     Valor = nf.Valor,
-                    DataVencimento = DateOnly.FromDateTime(nf.DataVencimento),
+                    DataVencimento = nf.DataVencimento,
                     EmpresaId = nf.EmpresaId
                 }).ToList()
             };
@@ -57,11 +58,12 @@ namespace GerenciadorRecebiveisAPI.Controllers
         }
 
         [HttpPost("{id:int}/adicionarNotaFiscal")]
-        public async Task<ActionResult> AdicionarNotaFiscal(int id, int notaFiscalId)
+        public async Task<ActionResult> AdicionarNotaFiscal(int id, [Required] int notaFiscalId)
         {
             var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
+            DateOnly hoje = DateOnly.FromDateTime(DateTime.Now);
 
-            if (notaFiscal.EmpresaId != id && notaFiscal.DataVencimento.Date > DateTime.Now.AddDays(1).Date)
+            if (notaFiscal.EmpresaId != id && notaFiscal.Vencida())
             {
                 throw new ArgumentException();
             }

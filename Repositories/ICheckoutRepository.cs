@@ -10,5 +10,6 @@ namespace GerenciadorRecebiveisAPI.Repositories
     {
         Task<Checkout> CreateAsync(Checkout checkout);
         Task<Checkout> GetAsync(int id);
+        Task<Checkout> GetCheckoutByCarrinhoId(int carrinhoId);
     }
 }

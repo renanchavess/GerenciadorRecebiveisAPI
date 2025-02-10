@@ -31,9 +31,6 @@ namespace GerenciadorRecebiveisAPI.Repositories
         {
             var empresa = await _context.Empresas.FindAsync(id);
 
-            if (empresa == null)            
-                throw new ArgumentNullException(nameof(empresa));
-
             return empresa;
         }
     }

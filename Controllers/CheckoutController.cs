@@ -34,8 +34,16 @@ namespace GerenciadorRecebiveisAPI.Controllers
                 return BadRequest("Carrinho sem notas fiscais!");
             }
 
+            Checkout checkout = await _checkoutRepository.GetCheckoutByCarrinhoId(carrinhoId);
+
+            if (checkout is not null)
+            {
+                return BadRequest("Checkout já realizado!");
+            }
+
             decimal taxa = 4.65m;
-            Checkout checkout = new Checkout(taxa, carrinho);
+            
+            checkout = new Checkout(taxa, carrinho);
 
             if (checkout.ValidarLimiteAntecipacao()) {
                 return BadRequest("Limite de antecipação excedido!");
