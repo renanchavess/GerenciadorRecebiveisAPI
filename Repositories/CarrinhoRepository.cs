@@ -46,9 +46,19 @@ namespace GerenciadorRecebiveisAPI.Repositories
             var carrinho = await _context.Carrinhos
                                     .Include(c => c.Empresa)
                                     .Include(c => c.NotasFiscais)
+                                    .Include(c => c.Checkout)
                                     .FirstOrDefaultAsync(c => c.Id == id);
 
             return carrinho;
+        }
+
+        public async Task<List<Carrinho>> GetCarrinhosByEmpresaIdAsync(int empresaId)
+        {
+            return await _context.Carrinhos                                
+                                .Include(c => c.NotasFiscais)
+                                .Include(c => c.Checkout)
+                                .Where(c => c.EmpresaId == empresaId)
+                                .ToListAsync();
         }
 
         public async Task<bool> RemoverNotaFiscalAsync(int id, NotaFiscal notafiscal)
@@ -61,6 +71,17 @@ namespace GerenciadorRecebiveisAPI.Repositories
             }
 
             carrinho.NotasFiscais.Remove(notafiscal);
+            _context.Entry(carrinho).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateAsync(Carrinho carrinho)
+        {
+            if (carrinho == null)
+            {
+                throw new ArgumentNullException(nameof(carrinho));
+            }
+
             _context.Entry(carrinho).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }

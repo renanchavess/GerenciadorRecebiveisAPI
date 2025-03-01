@@ -32,5 +32,10 @@ namespace GerenciadorRecebiveisAPI.Repositories
 
             return notafiscal;
         }
+
+        public async Task<List<NotaFiscal>> GetNotaFiscalByEmpresaId(int empresaId)
+        {
+            return _context.NotasFiscais.Where(nf => nf.EmpresaId == empresaId).ToList();
+        }
     }
 }

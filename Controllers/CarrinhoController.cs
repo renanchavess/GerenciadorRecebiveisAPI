@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.DTOs;
-using GerenciadorRecebiveisAPI.Models;
-using GerenciadorRecebiveisAPI.Repositories;
+using GerenciadorRecebiveisAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,95 +14,60 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class CarrinhoController : ControllerBase
     {
-        private readonly ICarrinhoRepository _repository;
-        private readonly INotaFiscalRepository _repositoryNotaFiscal;
-        private readonly ICheckoutRepository _repositoryCheckout;
 
-        public CarrinhoController(ICarrinhoRepository repository, INotaFiscalRepository repositoryNotaFiscal, ICheckoutRepository repositoryCheckout)
+        private readonly ICarrinhoService _service;
+
+        public CarrinhoController(ICarrinhoService service)
         {
-            _repositoryNotaFiscal = repositoryNotaFiscal;
-            _repositoryCheckout = repositoryCheckout;
-            _repository = repository;
+            _service = service;
         }
 
         [HttpGet("{id:int}", Name = "GetCarrinho")]
         public async Task<ActionResult<ResponseCarrinho>> GetCarrinho(int id)
         {
-            Carrinho carrinho = await _repository.GetCarrinhoAsync(id);
-            ResponseCarrinho responseCarrinho = new ResponseCarrinho()
-            {
-                Id = carrinho.Id,
-                EmpresaId = carrinho.EmpresaId,
-                NotasFiscais = carrinho.NotasFiscais.Select(nf => new ResponseNotaFiscal()
-                {
-                    Id = nf.Id,
-                    Numero = nf.Numero,
-                    Valor = nf.Valor,
-                    DataVencimento = nf.DataVencimento,
-                    EmpresaId = nf.EmpresaId
-                }).ToList()
-            };
-            
-            return responseCarrinho;
+            return await _service.GetCarrinhoAsync(id);
+        }
+
+        [HttpGet("empresa/{empresaId:int}")]
+        public async Task<ActionResult<List<ResponseCarrinho>>> GetCarrinhoByEmpresaId(int empresaId)
+        {
+            return await _service.GetCarrinhosByEmpresaIdAsync(empresaId);
+
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseCarrinho>> PostCarrinho(RequestPostCarrinho carrinhoRequest)
-        {
-            Carrinho carrinho = new Carrinho()
-            {
-                EmpresaId = carrinhoRequest.EmpresaId                
-            };
-
-            await _repository.CreateAsync(carrinho);
-            return CreatedAtAction("GetCarrinho", new { id = carrinho.Id }, carrinho);
+        public async Task<ActionResult<ResponseCarrinho>> PostCarrinho([Required][FromBody] RequestIdParam empresa)
+        {   
+            return await _service.CreateAsync(empresa.Id);
         }
 
-        [HttpPost("{id:int}/adicionarNotaFiscal")]
-        public async Task<ActionResult> AdicionarNotaFiscal(int id, [Required] int notaFiscalId)
+        [HttpPost("{carrinhoId:int}/adicionarNotaFiscal")]
+        public async Task<ActionResult> AdicionarNotaFiscal(int carrinhoId, [FromBody] RequestIdParam nota)
         {
-            var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
-            Checkout checkout = await _repositoryCheckout.GetCheckoutByCarrinhoId(id);
-            Carrinho carrinho = await _repository.GetCarrinhoAsync(id);
-
-            if (notaFiscal.EmpresaId != carrinho.EmpresaId)
+            if (await _service.AdicionarNotaFiscalAsync(carrinhoId, nota.Id))
             {
-                return BadRequest("Nota fiscal não pertence a empresa!");
+                return Ok();
             }
 
-            if (notaFiscal.Vencida())
-            {
-                return BadRequest("Nota fiscal vencida!");
-            }
-
-            if (checkout is not null)
-            {
-                return BadRequest("Checkout já realizado carrinho não pode ser alterado!");
-            }
-            
-            await _repository.AdicionarNotaFiscalAsync(id, notaFiscal);
-            return Ok();
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [HttpDelete("{id:int}/removerNotaFiscal")]
-        public async Task<ActionResult> RemoverNotaFiscal(int id, int notaFiscalId)
+        [HttpDelete("{carrinhoId:int}/removerNotaFiscal")]
+        public async Task<ActionResult> RemoverNotaFiscal(int carrinhoId, [FromBody] RequestIdParam nota)
         {
-            var notaFiscal = await _repositoryNotaFiscal.GetNotaFiscalAsync(notaFiscalId);
-            Checkout checkout = await _repositoryCheckout.GetCheckoutByCarrinhoId(id);
-
-            if (notaFiscal.CarrinhoId != id)
+            if (await _service.RemoverNotaFiscalAsync(carrinhoId, nota.Id))
             {
-                return BadRequest("Nota fiscal não pertence ao carrinho!");
-            }
-            
-            if (checkout is not null)
-            {
-                return BadRequest("Checkout já realizado carrinho não pode ser alterado!");
+                return Ok();
             }
 
-            await _repository.RemoverNotaFiscalAsync(id, notaFiscal);
-            
-            return Ok();
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpPatch("{id:int}/checkout")]
+        public async Task<ActionResult> Checkout(int id)
+        {
+            var checkout = await _service.RealizarCheckoutAsync(id);
+            return Ok(checkout);
         }
 
     }

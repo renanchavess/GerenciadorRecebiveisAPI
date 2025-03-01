@@ -1,3 +1,4 @@
+using GerenciadorRecebiveisAPI.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,27 @@ namespace GerenciadorRecebiveisAPI.Models
         public Carrinho()
         {
             NotasFiscais = new List<NotaFiscal>();
+        }
+
+        public void AdicionarNotaFiscal(NotaFiscal nota)
+        {
+            if (nota.EmpresaId != EmpresaId)
+            {
+                throw new ValidationException("Nota fiscal não pertence a empresa do carrinho.");
+            }
+
+            NotasFiscais.Add(nota);
+        }
+
+        public void RemoverNotaFiscal(NotaFiscal nota)
+        {
+            if (nota.CarrinhoId != Id)
+            {
+                throw new ValidationException("Nota fiscal não pertence ao carrinho.");
+            }
+
+            NotasFiscais.Remove(nota);
+            nota.CarrinhoId = null;
         }
 
         public decimal ValorTotalNotas()

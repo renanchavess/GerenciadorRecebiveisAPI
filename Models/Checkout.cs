@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.Enum;
+using GerenciadorRecebiveisAPI.Exceptions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace GerenciadorRecebiveisAPI.Models
@@ -71,12 +72,26 @@ namespace GerenciadorRecebiveisAPI.Models
             return empresa.Faturamento * percentual;
         }
 
-        public List<NotaFiscalCheckout> CalcularDesagio(double taxa)
+        public List<NotaFiscalCheckout> ExecutarCheckout()
         {
             var notaFiscalCheckout = new List<NotaFiscalCheckout>();
             decimal desagioTotal = 0;
-            taxa = taxa / 100;
-      
+            double taxa = (double)Taxa / 100;
+
+            if (taxa <= 0) {
+                throw new ValidationException("Taxa de deságio inválida.");
+            }
+
+            if (Carrinho.NotasFiscais.Count == 0)
+            {
+                throw new ValidationException("Carrinho sem notas fiscais.");
+            }
+
+            if (CalcularLimite(Carrinho.Empresa) < Carrinho.ValorTotalNotas())
+            {
+                throw new ValidationException("Faturamento das notas é superior ao limite da empresa.");
+            }
+
             foreach (var notaFiscal in Carrinho.NotasFiscais)
             {
                 double desagioNota = (double)notaFiscal.Valor / Math.Pow((1.00 + taxa), (notaFiscal.Prazo() / 30.00));                

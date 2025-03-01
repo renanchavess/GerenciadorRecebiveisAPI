@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GerenciadorRecebiveisAPI.DTOs;
-using GerenciadorRecebiveisAPI.Models;
-using GerenciadorRecebiveisAPI.Repositories;
+using GerenciadorRecebiveisAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,46 +13,29 @@ namespace GerenciadorRecebiveisAPI.Controllers
     [Route("api/[controller]")]
     public class EmpresaController : ControllerBase
     {
-        private readonly IEmpresaRepository _repository;
+        private readonly IEmpresaService _service;
 
-        public EmpresaController(IEmpresaRepository repository)
+        public EmpresaController(IEmpresaService service)
         {
-            _repository = repository;
+            _service = service;
         }
-        
+
+        [HttpGet]
+        public async Task<List<ResponseEmpresa>> GetEmpresas()
+        {
+            return await _service.GetEmpresasAsync();
+        }
+
         [HttpGet("{id:int}", Name = "GetEmpresa")]
         public async Task<ActionResult<ResponseEmpresa>> GetEmpresa(int id)
         {
-            var empresa = await _repository.GetEmpresaAsync(id);
-
-            ResponseEmpresa responseEmpresa = new ResponseEmpresa()
-            {
-                Id = empresa.Id,
-                Nome = empresa.Nome,
-                Cnpj = empresa.CNPJ,
-                Faturamento = empresa.Faturamento,
-                Ramo = empresa.Ramo
-            };
-
-            return responseEmpresa;
+            return await _service.GetEmpresaByIdAsync(id);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Empresa>> PostEmpresa(RequestPostEmpresa empresaPost)
+        public async Task<ResponseEmpresa> PostEmpresa([FromBody] RequestPostEmpresa empresaPost)
         {
-            if (empresaPost == null)
-                return BadRequest();
-
-            Empresa empresa = new Empresa()
-            {
-                Nome = empresaPost.Nome,
-                CNPJ = empresaPost.Cnpj,
-                Faturamento = empresaPost.Faturamento,
-                Ramo = empresaPost.Ramo
-            };
-            
-            await _repository.CreateAsync(empresa);
-            return CreatedAtAction("GetEmpresa", new { id = empresa.Id }, empresa);
+            return await _service.CreateEmpresaAsync(empresaPost);
         }
     }
 }

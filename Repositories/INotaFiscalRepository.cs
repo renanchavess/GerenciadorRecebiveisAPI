@@ -10,5 +10,6 @@ namespace GerenciadorRecebiveisAPI.Repositories
     {
         Task<NotaFiscal> GetNotaFiscalAsync(int id);
         Task<NotaFiscal> CreateAsync(NotaFiscal notafiscal);
+        Task<List<NotaFiscal>> GetNotaFiscalByEmpresaId(int empresaId);
     }
 }

@@ -8,7 +8,9 @@ namespace GerenciadorRecebiveisAPI.Repositories
 {
     public interface IEmpresaRepository
     {
-        Task<Empresa> GetEmpresaAsync(int id);
+        Task<Empresa> GetEmpresaByIdAsync(int id);
+        Task<IEnumerable<Empresa>> GetEmpresasAsync();
         Task<Empresa> CreateAsync(Empresa empresa);
+        Task<Empresa> GetEmpresaByCnpjAsync(string cnpj);
     }
 }
