@@ -37,7 +37,7 @@ namespace GerenciadorRecebiveisAPI.Services
 
             if (empresa is not null)
             {
-               throw new ValidationException("Empresa já cadastrada");
+               throw new ValidationException("CNPJ já cadastrada");
             }
 
             empresa = new Empresa()
